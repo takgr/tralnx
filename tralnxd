@@ -29,6 +29,7 @@ use Config;
 use File::Basename;
 use Getopt::Std;
 use Geo::Inverse;
+use GPS::Point;
 use IO::Handle;
 use IO::Socket::INET;
 use Log::Dispatch;
@@ -184,6 +185,10 @@ sub gpsdData() {
     if($data->class eq 'TPV') {
 	my $now = time();
 
+	# dont send if no valid GPS data
+	my $zeroP = new GPS::Point;
+        if( ($data->point)->distance($zeroP) == 0.0) {return};
+	
 	# send interval
 	if($last + $tralnx_conf{maxinterval} > $now) {
 	    return if($last + $tralnx_conf{interval} > $now || (defined($lpoint) && $lpoint->distance($data->point) < $tralnx_conf{mindist}))
