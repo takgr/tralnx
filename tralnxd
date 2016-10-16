@@ -3,7 +3,8 @@
 # tralnx - Traccar Linux Client
 #
 # Authors:
-#   Thomas Liske <thomas@fiasko-nw.net>
+#   Thomas Liske <thomas@fiasko-nw.net> (original version 0.1)
+#   Daniel Till <info@danieltill.de> (fork)
 #
 # Copyright Holder:
 #   2013 (C) Thomas Liske <thomas@fiasko-nw.net>
@@ -47,7 +48,7 @@ $0 = 'tralnxd';
 $|++;
 
 use constant {
-    TRALNX_VERSION => '0.1',
+    TRALNX_VERSION => '0.2',
 };
 
 my $logfmt = sub { my %p = @_; chomp($p{'message'}); return ("[$p{level}] $p{message}\n"); };
