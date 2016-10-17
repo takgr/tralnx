@@ -3,7 +3,8 @@ tralnx
 
 About
 -----
-tralnx is a traccar client for GNU/Linux. It uses gpsd(8) to retrieve and 
+tralnx is a traccar client for GNU/Linux written initially by Thomas Liske <thomas@fiasko-nw.net> and modified by Daniel Till.
+It uses gpsd(8) to retrieve and 
 send the current GPS location to a traccar[1] server instance.
 
 [1] http://www.traccar.org/
