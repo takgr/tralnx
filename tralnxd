@@ -3,8 +3,8 @@
 # tralnx - Traccar Linux Client
 #
 # Authors:
-#   Thomas Liske <thomas@fiasko-nw.net> (original version 0.1)
-#   Daniel Till <info@danieltill.de> (fork)
+#   Thomas Liske <thomas@fiasko-nw.net>
+#   Daniel Till <info@danieltill.de> (some small but essential changes)
 #
 # Copyright Holder:
 #   2013 (C) Thomas Liske <thomas@fiasko-nw.net>
@@ -28,8 +28,8 @@
 use Config;
 use File::Basename;
 use Getopt::Std;
-use Geo::Inverse;
 use GPS::Point;
+use Geo::Inverse;
 use IO::Handle;
 use IO::Socket::INET;
 use Log::Dispatch;
@@ -165,10 +165,7 @@ if(exists($tralnx_conf{pospipe})) {
     }
 }
 
-my $socket = new IO::Socket::INET(
-		PeerAddr => join(':', $traccar_conf{'host'}, $traccar_conf{'port'}),
-		Proto => 'udp',
-) or mydie("failed to create socket: $!");
+
 my $satellites = 0;
 my $last = 0;
 
@@ -181,17 +178,16 @@ sub deg2int($) {
 
 sub gpsdData() {
     my $data = shift;
-
     if($data->class eq 'TPV') {
 	my $now = time();
-
-	# dont send if no valid GPS data
-	my $zeroP = new GPS::Point;
-        if( ($data->point)->distance($zeroP) == 0.0) {return};
 	
+	# stop if wrong GPS
+	my $zeroP = new GPS::Point;
+	if( ($data->point)->distance($zeroP) == 0.0) {return};
+
 	# send interval
 	if($last + $tralnx_conf{maxinterval} > $now) {
-	    return if($last + $tralnx_conf{interval} > $now || (defined($lpoint) && $lpoint->distance($data->point) < $tralnx_conf{mindist}))
+	    return if($last + $tralnx_conf{interval} > $now  || (defined($lpoint) && $lpoint->distance($data->point) < $tralnx_conf{mindist}))
 	}
 	$last = $now;
 	$lpoint = $data->point;
@@ -267,7 +263,12 @@ sub gpsdData() {
 	    $mask,	# mask
 	) . $send;
 
+        my $socket = new IO::Socket::INET(
+		PeerAddr => join(':', $traccar_conf{'host'}, $traccar_conf{'port'}),
+		Proto => 'udp',
+        ) or mydie("failed to create socket: $!");
 	$socket->send($send);
+	close($socket);
     }
     elsif($data->class eq 'SKY') {
 	$satellites = $data->used;
@@ -278,6 +279,8 @@ sub gpsdData() {
 }
 
 while(1) {
+    
+    
     my $gpsd = Net::GPSD3->new(%gpsd_conf);
     $gpsd->addHandler(\&gpsdData);
 
