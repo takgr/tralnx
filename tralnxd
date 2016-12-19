@@ -201,7 +201,19 @@ sub gpsdData() {
 	# Device ID
 	$mask += 1 << 2;
 	$send .= pack('(a22)>', $traccar_conf{'devid'});
-
+	
+	#Sensor Data
+	if(defined($data->sensor1)) {
+	$mask += 1 << 5;
+	$send .= pack('(S)>', int($data->sensor1 * 10));
+	}
+	
+	#Sensor Data
+	if(defined($data->sensor2)) {
+	$mask += 1 << 6;
+	$send .= pack('(S)>', int($data->sensor2 * 10));
+	}
+	
 	# Date
 	my $dt;
 	if(defined($data->timestamp) || defined($data->time)) {
